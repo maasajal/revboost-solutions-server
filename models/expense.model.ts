@@ -3,22 +3,27 @@ import mongoose from "mongoose";
 
 const ExpenseSchema = new mongoose.Schema({
     companyName: {
-        type: String
+        type: String,
+        required: true,
     },
     create: {
-        type: String
+        type: String,
+        required: true,
     },
     no: {
         type: Number
     },
     item: {
-        type: String
+        type: String,
+        required: true,
     },
     quantity: {
-        type: Number
+        type: Number,
+        required: true,
     },
     unitPrice: {
-        type: Number
+        type: Number,
+        required: true,
     },
 
 });
