@@ -4,12 +4,10 @@ import mongoose from "mongoose";
 const today = new Date();
 const RegisterSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: true,
+    type: String, 
   },
   photo: {
-    type: String,
-    required: true,
+    type: String, 
   },
   email: {
     type: String,
@@ -17,16 +15,14 @@ const RegisterSchema = new mongoose.Schema({
     unique: true,
   },
   password: {
-    type: String,
-    required: true,
+    type: String, 
   },
   role: {
     type: String, 
     default:'user',  
   },
   companyName: {
-    type: String,
-    required: true,
+    type: String, 
   },
   date: {
     type: String, 
