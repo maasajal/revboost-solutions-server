@@ -29,7 +29,7 @@ const ExpenseSchema = new mongoose.Schema({
 });
 
 
-export const RegisterModel = mongoose.model(
+export const ExpenseModel = mongoose.model(
     "expenseCollections",
     ExpenseSchema
 );
