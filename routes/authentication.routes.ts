@@ -24,14 +24,17 @@ router.route("/register").post(async (req: Request, res: Response) => {
 
 router.route("/login").post(async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body; 
-    const result = await RegisterModel.findOne({ email }); 
-    if (result?.email == email && result?.password === password) {
-      //check user validation
+    const data = req.body;
+    const { email } = data;
+    const isExist = await RegisterModel.findOne({ email });
+    console.log(isExist);
+    if (isExist === null) {
+      const result = await RegisterModel.create(data);
+      const token = generateToken(email); // create token 
+      res.status(200).send({ message: token }); 
+    } else {
       const token = generateToken(email); // create token
       res.status(200).send({ message: token }); // send token
-    } else {
-      res.status(403).json({ message: "is not valid user Forbidden  access " });
     }
   } catch (error) {
     console.error("Error saving data:", error);

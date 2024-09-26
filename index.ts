@@ -3,12 +3,19 @@ import authenticationRouter from "./routes/authentication.routes";
 import expenseRouter from "./routes/expense.routes"
 import authorization from "./routes/authorization/authorization";
 import { ConnectDB } from "./routes/db.config";
+const cors = require('cors');
 
 const app: Express = express();
 const PORT: number = 3000;
 
 ConnectDB();
 
+const corsOptions = {
+  origin: ["http://localhost:5173", "http://localhost:5174","https://revboost.business-easy.com"],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/v1", authenticationRouter); // এই লাইন মুলত আমাদের authentication  API গুলাকে হিট করবে
