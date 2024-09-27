@@ -1,8 +1,6 @@
 import express, { Express, Request, Response } from "express";
-import authenticationRouter from "./routes/authentication.routes";
-import expenseRouter from "./routes/expense.routes"
-import authorization from "./routes/authorization/authorization";
-import { ConnectDB } from "./routes/db.config";
+import { ConnectDB } from "./mongodb/db.config";
+import addressRoute from "./routes/expense.route"
 
 const app: Express = express();
 const PORT: number = 3000;
@@ -11,9 +9,7 @@ ConnectDB();
 
 app.use(express.json());
 
-app.use("/api/v1", authenticationRouter); // এই লাইন মুলত আমাদের authentication  API গুলাকে হিট করবে
-app.use("/authorize", authorization); // এই রাউট অথরাইজেশন এর জন্যে কাজ করবে এবং সে authorization.ts রাউটে যাবে
-app.use("api/v1/expense",expenseRouter);
+app.use("api/v1/expense",addressRoute)
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });

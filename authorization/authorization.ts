@@ -1,8 +1,8 @@
-import express, { Request, Response, Router } from "express";
-import { RegisterModel } from "../../models/register.models";
+import express, { Request, Response, Router } from "express"
 const router: Router = express.Router();
 
-import { authMiddleware } from "../../middleware/authMiddleware";
+import { RegisterModel } from "../models/register.models";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 router
   .route("/privet-rout")

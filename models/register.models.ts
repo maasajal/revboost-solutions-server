@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 
-
 const today = new Date();
 const RegisterSchema = new mongoose.Schema({
   name: {
