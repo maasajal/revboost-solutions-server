@@ -2,14 +2,7 @@ import mongoose from "mongoose";
 
 
 const ExpenseSchema = new mongoose.Schema({
-    companyName: {
-        type: String,
-        required: true,
-    },
-    create: {
-        type: String,
-        required: true,
-    },
+    
     no: {
         type: Number
     },
@@ -30,6 +23,6 @@ const ExpenseSchema = new mongoose.Schema({
 
 
 export const ExpenseModel = mongoose.model(
-    "expenseCollections",
+    "ExpenseModel",
     ExpenseSchema
 );
