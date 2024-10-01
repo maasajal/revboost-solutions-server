@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import authenticationRouter from "./routes/authentication.routes";
-import expenseRouter from "./routes/expense.routes"
+import expenseRouter from "./routes/expense.route";
+import expenseAddressRoute from "./routes/expense.address.route";
 import authorization from "./routes/authorization/authorization";
 import { ConnectDB } from "./routes/db.config";
 const cors = require('cors');
@@ -18,9 +19,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/api/v1", authenticationRouter); // এই লাইন মুলত আমাদের authentication  API গুলাকে হিট করবে
-app.use("/authorize", authorization); // এই রাউট অথরাইজেশন এর জন্যে কাজ করবে এবং সে authorization.ts রাউটে যাবে
-app.use("api/v1/expense",expenseRouter);
+app.use("/api/v1", authenticationRouter); 
+app.use("/authorize", authorization); 
+app.use("/api/v1/expense",expenseRouter);
+app.use("/api/v1/address",expenseAddressRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
