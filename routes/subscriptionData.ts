@@ -2,7 +2,7 @@ import express,{Request, Response, Router} from "express"
 import { SubscriptionDataSchemaModel } from "../models/subscription.model"
 
 const router : Router = express.Router()
-router.route("/subcriptiondata").post(async(req : Request, res : Response)=>{
+router.route("/subcription").post(async(req : Request, res : Response)=>{
     console.log(req.body)
     // res.send(req.body)
   try {
