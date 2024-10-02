@@ -1,10 +1,14 @@
 import mongoose from "mongoose";
 
 const SubscriptionDataSchema = new mongoose.Schema({
-    name : {
-        type : String,
-    },
-    age : Number
+    name: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
 })
 
-export const SubscriptionDataSchemaModel = mongoose.model("collection_name",SubscriptionDataSchema)
+export const SubscriptionDataSchemaModel = mongoose.model("SubscriptionData",SubscriptionDataSchema)
