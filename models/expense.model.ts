@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 
 const ExpenseSchema = new mongoose.Schema({
-    
+
     no: {
         type: Number
     },
@@ -18,6 +18,9 @@ const ExpenseSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    total: {
+        type: Number,
+    }
 
 });
 
