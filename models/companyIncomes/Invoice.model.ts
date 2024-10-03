@@ -6,13 +6,13 @@ const invoiceSchema = new mongoose.Schema({
     invoiceNumber: String,
     date: String,
     customerAddress: String,
-    items: [{
-      no: Number,
-      item: String,
-      quantity: Number,
-      unitPrice: Number,
-      totalAmount: Number
-    }]
+    // items: [{
+    //   no: Number,
+    //   item: String,
+    //   quantity: Number,
+    //   unitPrice: Number,
+    //   totalAmount: Number
+    // }]
   });
 
 export  const InvoiceModel = mongoose.model('Invoice', invoiceSchema);
