@@ -14,8 +14,12 @@ export const createInvoices = async (req: Request, res: Response) => {
       invoiceDueDate,
       customerAddress,
     });
+    // Save the invoice bill in the database
     await newInvoice.save();
-    res.status(201).send(newInvoice);
+    res.status(201).json({
+      message: "Invoice Bill created successfully",
+      data: newInvoice,
+  });
   } catch (error) {
     res.status(400).send(error);
   }
