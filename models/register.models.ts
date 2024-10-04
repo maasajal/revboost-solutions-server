@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 
-
 const today = new Date();
 const RegisterSchema = new mongoose.Schema({
   name: {
-    type: String, 
+    type: String,
   },
   photo: {
-    type: String, 
+    type: String,
   },
   email: {
     type: String,
@@ -15,18 +14,26 @@ const RegisterSchema = new mongoose.Schema({
     unique: true,
   },
   password: {
-    type: String, 
+    type: String,
   },
   role: {
-    type: String, 
-    default:'user',  
+    type: String,
+    default: "user",
   },
   companyName: {
-    type: String, 
+    type: String,
   },
   date: {
-    type: String, 
-    default:today, 
+    type: String,
+    default: today,
+  },
+  subscriptionStatus: {
+    type: String,
+    default: "inactive",
+  },
+  selectedPackage: {
+    type: String,
+    default: null,
   },
 });
 
