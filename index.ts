@@ -6,6 +6,8 @@ import authorization from "./routes/authorization/authorization";
 import users from "./routes/users/users.routes";
 import { ConnectDB } from "./routes/db.config";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
+import revenueRouter from "./routes/revenueGrowth/revenue.routes";
+
 const cors = require("cors");
 
 const app: Express = express();
@@ -32,6 +34,7 @@ app.use("/api/v1/expense", expenseRouter);
 app.use("/api/v1/address", expenseAddressRoute);
 // invoice
 app.use("/api/v1/invoices", invoiceRouter);
+app.use("/api/v1", revenueRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
