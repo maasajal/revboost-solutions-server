@@ -1,9 +1,7 @@
 import express, { Express, Request, Response } from "express";
-import authenticationRouter from "./routes/authentication.routes";
 import expenseRouter from "./routes/expense.route";
 import expenseAddressRoute from "./routes/expense.address.route";
-import authorization from "./routes/authorization/authorization";
-import users from "./routes/users/users.routes";
+import authRouter from "./routes/authorization/auth.routes";
 import { ConnectDB } from "./routes/db.config";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
 import revenueRouter from "./routes/revenueGrowth/revenue.routes";
@@ -27,9 +25,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use("/api/v1", authenticationRouter);
-app.use("/authorize", authorization);
-app.use("/api/v1", users);
+// Authentication routers
+app.use("/api/v1", authRouter);
+// Features routers | please use this format = app.use("/api/v1", <yourRouter>);
+
 app.use("/api/v1/expense", expenseRouter);
 app.use("/api/v1/address", expenseAddressRoute);
 // invoice
