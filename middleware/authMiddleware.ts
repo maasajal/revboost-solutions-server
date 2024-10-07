@@ -27,7 +27,7 @@ export const authMiddleware = (
   try {
     // Check if the token is missing
     if (!token) {
-      return res.status(403).json({ message: "Token missing" });
+      return res.status(401).json({ message: "Token missing" });
     }
 
     // Verify the token
@@ -44,3 +44,8 @@ export const authMiddleware = (
     return res.status(403).json({ message: "Token missing" });
   }
 };
+
+export const isAdminMiddleware = (req:Request, res:Response, next:NextFunction)=>{
+console.log("pass middleware")
+next()
+}

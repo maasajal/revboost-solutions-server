@@ -1,6 +1,7 @@
 import express, { Request, Response, Router } from "express";
+import { isAdmin } from "../../controllers/authorizationController/authorizationController";
+import { isAdminMiddleware } from "../../middleware/authMiddleware";
 import { RegisterModel } from "../../models/register.models";
-import { generateToken } from "../../jwt/jwt";
 
 const router: Router = express.Router();
 
@@ -71,5 +72,9 @@ router
       res.status(500).send({ message: "Error updating user data" });
     }
   });
+
+
+
+  router.route("/admin").get(isAdminMiddleware ,isAdmin);
 
 export default router;
