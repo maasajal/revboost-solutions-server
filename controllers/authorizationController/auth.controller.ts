@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel } from "../../models/auth.model";
 import { generateToken } from "../../jwt/jwt";
+import mongoose from "mongoose";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -15,14 +16,12 @@ export const registerUser = async (req: Request, res: Response) => {
     const userId = addUser?._id;
     if (addUser) {
       const token = generateToken(email);
-      res
-        .status(200)
-        .send({
-          message: "User registered successfully",
-          token,
-          userId,
-          email,
-        });
+      res.status(200).send({
+        message: "User registered successfully",
+        token,
+        userId,
+        email,
+      });
     } else {
       res.status(400).send({ message: "Invalid user data" });
     }
@@ -80,5 +79,28 @@ export const updateUserByEmail = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(404).send({ Error: "Users not found!" });
+  }
+};
+
+export const deleteUserById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).send({ message: "Invalid user ID" });
+    }
+
+    const user = await UserModel.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .send({ message: `User with ID ${id} was successfully deleted` });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };
