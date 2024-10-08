@@ -1,6 +1,4 @@
 import express, { Request, Response, Router } from "express";
-import { isAdmin } from "../../controllers/authorizationController/authorizationController";
-import { isAdminMiddleware } from "../../middleware/authMiddleware";
 import { RegisterModel } from "../../models/register.models";
 
 const router: Router = express.Router();
@@ -75,6 +73,5 @@ router
 
 
 
-  router.route("/admin").get(isAdminMiddleware ,isAdmin);
 
 export default router;

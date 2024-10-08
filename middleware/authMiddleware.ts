@@ -16,13 +16,19 @@ interface JwtPayload {
   // Add other properties that may be included in the token
 }
 
+interface Authorization {
+  authorization :string  | undefined
+}
 // Middleware for authenticating JWT tokens
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
-  const token = req.body.token;
+) => { 
+const authorization = req.headers.authorization
+const token = authorization?.split(' ')[1]
+ 
+  // const token = req.body.token;
 
   try {
     // Check if the token is missing
