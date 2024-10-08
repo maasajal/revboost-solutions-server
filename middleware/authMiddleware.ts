@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { VerifyErrors } from "jsonwebtoken";
+import { UserModel } from "../models/auth.model";
 
 // Extend the Express Request interface to include the email property
 declare global {
@@ -51,7 +52,15 @@ const token = authorization?.split(' ')[1]
   }
 };
 
-export const isAdminMiddleware = (req:Request, res:Response, next:NextFunction)=>{
-console.log("pass middleware")
-next()
+export const isAdminMiddleware = async(req:Request, res:Response, next:NextFunction)=>{
+  const email = req?.email;
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(403).send({ message: "messing" });
+  } else if (user.role === "admin") {
+    next()
+  } else{
+    res.status(403).send({ message: "you are not admin" });
+
+  }
 }
