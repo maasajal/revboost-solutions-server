@@ -1,10 +1,10 @@
 import express, { Router } from "express";
 import {
-  registerUser,
-  getUsers,
-  updateUserByEmail,
-  getUserByEmail,
   deleteUserById,
+  getUserByEmail,
+  getUsers,
+  registerUser,
+  updateUserByEmail,
 } from "../../controllers/authorizationController/auth.controller";
 // import { AdminMiddleware } from "../../middleware/adminMiddleware";
 

@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
-import { UserModel } from "../../models/auth.model";
-import { generateToken } from "../../jwt/jwt";
 import mongoose from "mongoose";
+import { generateToken } from "../../jwt/jwt";
+import { UserModel } from "../../models/auth.model";
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
     const { email } = userData;
     const userExists = await UserModel.findOne({ email });
+    const token = generateToken(email);
 
     if (userExists) {
-      return res.status(400).send({ message: "User already exists" });
+      return res.status(200).send({ message: token });
     }
     const addUser = await UserModel.create(userData);
     const userId = addUser?._id;
     if (addUser) {
-      const token = generateToken(email);
       res.status(200).send({
-        message: "User registered successfully",
+        message: token,
         token,
         userId,
         email,
