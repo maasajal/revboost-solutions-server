@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from "express";
-import authenticationRoute from "./routes/authentication.routes";
 import authRouter from "./routes/authorization/auth.routes";
 import { ConnectDB } from "./routes/db.config";
 import expenseAddressRoute from "./routes/expense.address.route";
@@ -26,8 +25,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Authentication routers
-app.use("/api/v1", authRouter);
-app.use("/api/v1/login", authenticationRoute);
+app.use("/api/v1", authRouter); 
 // Features routers | please use this format = app.use("/api/v1", <yourRouter>);
 
 app.use("/api/v1/expense", expenseRouter);

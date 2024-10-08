@@ -18,19 +18,16 @@ interface JwtPayload {
 }
 
 interface Authorization {
-  authorization :string  | undefined
+  authorization: string | undefined;
 }
 // Middleware for authenticating JWT tokens
 export const authMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => { 
-const authorization = req.headers.authorization
-const token = authorization?.split(' ')[1]
- 
-  // const token = req.body.token;
-
+) => {
+  const authorization = req.headers.authorization;
+  const token = authorization?.split(" ")[1];
   try {
     // Check if the token is missing
     if (!token) {
@@ -38,29 +35,36 @@ const token = authorization?.split(' ')[1]
     }
 
     // Verify the token
-    jwt.verify(token, `${process.env.JWT_SECRET}`, (err: VerifyErrors | null, decoded: unknown) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid token" });
-      } else {
-        // Type assertion to JwtPayload
-        req.email = (decoded as JwtPayload)?.email; // Set the email to the request
-        next(); // Continue to the next middleware
+    jwt.verify(
+      token,
+      `${process.env.JWT_SECRET}`,
+      (err: VerifyErrors | null, decoded: unknown) => {
+        if (err) {
+          return res.status(403).json({ message: "Invalid token" });
+        } else {
+          // Type assertion to JwtPayload
+          req.email = (decoded as JwtPayload)?.email; // Set the email to the request
+          next(); // Continue to the next middleware
+        }
       }
-    });
+    );
   } catch (error) {
     return res.status(403).json({ message: "Token missing" });
   }
 };
 
-export const isAdminMiddleware = async(req:Request, res:Response, next:NextFunction)=>{
+export const adminMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const email = req?.email;
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
   } else if (user.role === "admin") {
-    next()
-  } else{
+    next();
+  } else {
     res.status(403).send({ message: "you are not admin" });
-
   }
-}
+};
