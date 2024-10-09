@@ -68,3 +68,51 @@ export const adminMiddleware = async (
     res.status(403).send({ message: "you are not admin" });
   }
 };
+
+export const basicPlanMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const email = req?.email;
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(403).send({ message: "messing" });
+  } else if (user.role === "admin" || user.role === "basic") {
+    next();
+  } else {
+    res.status(403).send({ message: "you are not admin" });
+  }
+};
+
+export const standardPlanMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const email = req?.email;
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(403).send({ message: "messing" });
+  } else if (user.role === "admin" || user.role === "standard") {
+    next();
+  } else {
+    res.status(403).send({ message: "you are not admin" });
+  }
+};
+
+export const premiumPlanMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const email = req?.email;
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    res.status(403).send({ message: "messing" });
+  } else if (user.role === "admin" || user.role === "premium") {
+    next();
+  } else {
+    res.status(403).send({ message: "you are not admin" });
+  }
+};
