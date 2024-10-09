@@ -5,6 +5,8 @@ import expenseAddressRoute from "./routes/expense.address.route";
 import expenseRouter from "./routes/expense.route";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
 import revenueRouter from "./routes/revenueGrowth/revenue.routes";
+import payrollRouter from "./routes/payroll/payroll.routes";
+
 const cors = require("cors");
 
 const app: Express = express();
@@ -33,6 +35,8 @@ app.use("/api/v1/address", expenseAddressRoute);
 // invoice
 app.use("/api/v1/invoices", invoiceRouter);
 app.use("/api/v1", revenueRouter);
+// payroll
+app.use("/api/v1/payroll", payrollRouter);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
