@@ -28,6 +28,7 @@ export const authMiddleware = (
 ) => {
   const authorization = req.headers.authorization;
   const token = authorization?.split(" ")[1];
+  console.log(token)
   try {
     // Check if the token is missing
     if (!token) {

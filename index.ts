@@ -1,11 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import authRouter from "./routes/authorization/auth.routes";
+import authorization from "./routes/authorization/authorization.routes";
 import { ConnectDB } from "./routes/db.config";
 import expenseAddressRoute from "./routes/expense.address.route";
 import expenseRouter from "./routes/expense.route";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
-import revenueRouter from "./routes/revenueGrowth/revenue.routes";
 import payrollRouter from "./routes/payroll/payroll.routes";
+import revenueRouter from "./routes/revenueGrowth/revenue.routes";
+
 import priceRouter from "./routes/pricing/pricing.router"
 
 const cors = require("cors");
@@ -29,6 +31,7 @@ app.use(express.json());
 
 // Authentication routers
 app.use("/api/v1", authRouter); 
+app.use("/api/v1", authorization); 
 // Features routers | please use this format = app.use("/api/v1", <yourRouter>);
 
 app.use("/api/v1/expense", expenseRouter);
