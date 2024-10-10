@@ -3,6 +3,7 @@ import { revenueGrowth } from "../../controllers/revenueGrowth/revenue.controlle
 
 const router = express.Router();
 
-router.get("/revenue-growth", revenueGrowth);
+router.get("/revenue-growth/:id", revenueGrowth);
+router.post("/revenue-growth", revenueGrowth);
 
 export default router;
