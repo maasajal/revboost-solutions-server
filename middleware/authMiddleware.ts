@@ -59,6 +59,7 @@ export const adminMiddleware = async (
   next: NextFunction
 ) => {
   const email = req?.email;
+  console.log("email:", email);
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
@@ -78,7 +79,10 @@ export const basicPlanMiddleware = async (
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
-  } else if (user.role === "admin" || user.role === "basic") {
+  } else if (
+    user.role === "admin" ||
+    (user.role === "member" && user.subscriptionPlan === "basic")
+  ) {
     next();
   } else {
     res.status(403).send({ message: "you are not admin" });
@@ -94,7 +98,10 @@ export const standardPlanMiddleware = async (
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
-  } else if (user.role === "admin" || user.role === "standard") {
+  } else if (
+    user.role === "admin" ||
+    (user.role === "member" && user.subscriptionPlan === "standard")
+  ) {
     next();
   } else {
     res.status(403).send({ message: "you are not admin" });
@@ -110,7 +117,10 @@ export const premiumPlanMiddleware = async (
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
-  } else if (user.role === "admin" || user.role === "premium") {
+  } else if (
+    user.role === "admin" ||
+    (user.role === "member" && user.subscriptionPlan === "premium")
+  ) {
     next();
   } else {
     res.status(403).send({ message: "you are not admin" });
