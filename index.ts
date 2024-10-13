@@ -5,6 +5,8 @@ import { ConnectDB } from "./routes/db.config";
 import expenseAddressRoute from "./routes/expense.address.route";
 import expenseRouter from "./routes/expense.route";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
+// income
+import incomeRoutes from "./routes/invoiceRoutes/invoice.routes"
 import payrollRouter from "./routes/payroll/payroll.routes";
 import revenueRouter from "./routes/revenueGrowth/revenue.routes";
 
@@ -36,6 +38,8 @@ app.use("/api/v1", authorization);
 
 app.use("/api/v1/expense", expenseRouter);
 app.use("/api/v1/address", expenseAddressRoute);
+// income
+app.use("/api/v1/income", incomeRoutes);
 // invoice
 app.use("/api/v1/invoices", invoiceRouter);
 app.use("/api/v1", revenueRouter);
