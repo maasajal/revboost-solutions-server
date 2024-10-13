@@ -33,4 +33,4 @@ const incomeCollectionSchema = new mongoose.Schema({
   incomeEntries: [incomeEntrySchema],
 });
 
-module.exports = mongoose.model('IncomeCollection', incomeCollectionSchema);
+export const IncomeModel = mongoose.model('IncomeCollection', incomeCollectionSchema);
