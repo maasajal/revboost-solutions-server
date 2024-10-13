@@ -25,11 +25,6 @@ const payrollSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["active", "inactive"],
-      required: true,
-    },
     salary: {
       type: Number,
       required: true,
