@@ -40,21 +40,3 @@ export const createExpenseAddress = async (req: Request, res: Response) => {
     }
 }
 
-
-// export const updateExpenseAddress = async(req: Request, res: Response) =>{
-//     try {
-        
-//     } catch (error: unknown) {
-//         if (error instanceof Error) {
-//             res.status(500).json({
-//                 message: "Error update expense address entry",
-//                 error: error.message,
-//             });
-//         } else {
-
-//             res.status(500).json({
-//                 message: "An unknown error occurred",
-//             });
-//         }
-//     }
-// }

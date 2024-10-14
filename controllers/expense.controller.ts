@@ -3,9 +3,8 @@ import { ExpenseModel } from "../models/expense.model"
 export const createExpense = async (req: Request, res: Response): Promise<void> => {
     try {
         const { no, item, quantity, unitPrice } = req.body;
-        let { total } = req.body;
         console.log(req.body);
-        
+        let { total } = req.body;
         total = quantity * unitPrice;
 
         // Create a new expense entry using the model
@@ -84,6 +83,28 @@ export const getIndividualExpense = async (req: Request, res: Response) => {
         if (error instanceof Error) {
             res.status(500).json({
                 message: "Error retrieving expense",
+                error: error.message,
+            });
+        } else {
+            res.status(500).json({
+                message: "An unknown error occurred",
+            });
+        }
+    }
+};
+
+
+export const getAllExpense = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const expenses = await ExpenseModel.find();
+        res.status(200).json({
+            message: "Expenses retrieved successfully",
+            data: expenses,
+        });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Error retrieving expenses",
                 error: error.message,
             });
         } else {
