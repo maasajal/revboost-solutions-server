@@ -4,6 +4,7 @@ import { ExpenseAddressModel } from "../models/expense.address.model";
 export const createExpenseAddress = async (req: Request, res: Response) => {
     try {
         const { companyName, create } = req.body;
+        console.log(req.body);
         if (!companyName) {
             return res.status(400).json({ message: "Company name is required" });
         }
@@ -38,3 +39,22 @@ export const createExpenseAddress = async (req: Request, res: Response) => {
         }
     }
 }
+
+
+// export const updateExpenseAddress = async(req: Request, res: Response) =>{
+//     try {
+        
+//     } catch (error: unknown) {
+//         if (error instanceof Error) {
+//             res.status(500).json({
+//                 message: "Error update expense address entry",
+//                 error: error.message,
+//             });
+//         } else {
+
+//             res.status(500).json({
+//                 message: "An unknown error occurred",
+//             });
+//         }
+//     }
+// }

@@ -4,6 +4,8 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
     try {
         const { no, item, quantity, unitPrice } = req.body;
         let { total } = req.body;
+        console.log(req.body);
+        
         total = quantity * unitPrice;
 
         // Create a new expense entry using the model
