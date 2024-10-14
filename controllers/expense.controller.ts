@@ -114,7 +114,7 @@ export const getAllExpense = async (req: Request, res: Response): Promise<void> 
 };
 
 
-export const deleteExpense = async (req: Request, res: Response) => {
+export const deleteIndividualExpense = async (req: Request, res: Response) => {
     try {
         const expenseId = req.params.id;
         const deletedExpense = await ExpenseModel.findByIdAndDelete(expenseId);
@@ -129,7 +129,7 @@ export const deleteExpense = async (req: Request, res: Response) => {
     } catch (error: unknown) {
         if (error instanceof Error) {
             res.status(500).json({
-                message: "Error retrieving expense",
+                message: "Error deleting individual expense",
                 error: error.message,
             });
         } else {
@@ -139,3 +139,25 @@ export const deleteExpense = async (req: Request, res: Response) => {
         }
     }
 };
+
+
+export const deleteExpense = async (req:Request, res: Response) =>{
+    try {
+        const deleteExpense = await ExpenseModel.deleteMany({});
+        res.status(200).json({
+            message : `${deleteExpense.deletedCount} all expense deleted successfully`
+        })
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({
+                message: "Error deleting expense  entry",
+                error: error.message,
+            });
+        } else {
+
+            res.status(500).json({
+                message: "An unknown error occurred",
+            });
+        }
+    }
+}
