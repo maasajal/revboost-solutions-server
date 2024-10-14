@@ -6,8 +6,6 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
         console.log(req.body);
         let { total } = req.body;
         total = quantity * unitPrice;
-
-        // Create a new expense entry using the model
         const newExpense = new ExpenseModel({
             no,
             item,
@@ -16,10 +14,10 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
             total
         });
 
-        // Save the expense entry in the database
+        
         await newExpense.save();
 
-        // Send success response
+        
         res.status(201).json({
             message: "Expense entry created successfully",
             data: newExpense,
@@ -31,7 +29,7 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
                 error: error.message,
             });
         } else {
-            // Fallback for cases where error is not an instance of Error
+            
             res.status(500).json({
                 message: "An unknown error occurred",
             });
