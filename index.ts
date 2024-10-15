@@ -11,7 +11,8 @@ import incomesRoutes from "./routes/incomeRoutes/incomeRoutes";
 import payrollRouter from "./routes/payroll/payroll.routes";
 import revenueRouter from "./routes/revenueGrowth/revenue.routes";
 
-import priceRouter from "./routes/pricing/pricing.router";
+import priceRouter from "./routes/pricing/pricing.router"
+import paymentRoutes from './routes/payment/payment.routes';
 
 const cors = require("cors");
 
@@ -47,8 +48,12 @@ app.use("/api/v1/invoices", invoiceRouter);
 app.use("/api/v1", revenueRouter);
 // payroll
 app.use("/api/v1/payroll", payrollRouter);
-// pricing
-app.use("/api/v1/pricing", priceRouter);
+
+// pricing 
+app.use("/api/v1/pricing", priceRouter)
+// payment sslcommerz
+app.use('/api/v1/payment', paymentRoutes);
+
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
 });
