@@ -25,6 +25,7 @@ export const addPayroll = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("BODY=>", req.body);
     const newPayroll = new Payroll(req.body);
     await newPayroll.save();
     res.status(200).json({
@@ -32,8 +33,44 @@ export const addPayroll = async (
       payroll: newPayroll,
     });
   } catch (err) {
+    const errorMessage = (err as Error).message; // Type assertion
+    console.error(err); // Log the actual error
     res.status(500).json({
       message: "There is a server side error to POST a payroll data!",
+      error: errorMessage, // Send the error message in the response
+    });
+  }
+};
+
+// update a payroll document
+export const updatePayroll = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const payrollId = req.params.id;
+    const filter = { _id: payrollId };
+    const update = {
+      $set: {
+        salary: 99999,
+      },
+    };
+    const options = { new: true }; // return the modified document rather than the original
+
+    const updatedPayroll = await Payroll.findByIdAndUpdate(
+      filter,
+      update,
+      options
+    );
+
+    console.log(updatedPayroll);
+    res.status(200).json({
+      message: "Employee updated successfully",
+      updatedPayroll,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "There is a server side error to DELETE a payroll data!",
     });
   }
 };
