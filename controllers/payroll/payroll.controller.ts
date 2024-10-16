@@ -49,10 +49,12 @@ export const updatePayroll = async (
 ): Promise<void> => {
   try {
     const payrollId = req.params.id;
+    const payrollData = req.body;
+    console.log(payrollData);
     const filter = { _id: payrollId };
     const update = {
       $set: {
-        salary: 99999,
+        ...payrollData,
       },
     };
     const options = { new: true }; // return the modified document rather than the original
