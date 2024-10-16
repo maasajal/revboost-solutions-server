@@ -45,6 +45,33 @@ export const addIncomeEntry = async (req: Request, res: Response) =>{
   }
 }
 
+export const deleteIncome = async (req: Request, res: Response) => {
+  try {
+    const { userId, incomeId } = req.params; // Get the userId and incomeId from the request parameters
+
+    // Find the income collection and remove the specific income entry
+    const updatedIncomeCollection = await IncomeModel.findOneAndUpdate(
+      { userId }, // Find by userId
+      { $pull: { incomeEntries: { incomeId } } }, // Use $pull to remove the income entry with the given incomeId
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedIncomeCollection) {
+      return res.status(404).send({
+        message: "Income collection not found or incomeId doesn't exist.",
+      });
+    }
+
+    // Return the updated incomeEntries array
+    res.status(200).send(updatedIncomeCollection.incomeEntries);
+  } catch (error) {
+    console.error("Error deleting income entry: ", error);
+    res
+      .status(500)
+      .send({ message: "Server error. Could not delete income entry." });
+  }
+};
+
 // module.exports = {
 //     getIncomeCollection,
 //     addIncomeEntry,
