@@ -22,7 +22,9 @@ const incomeEntrySchema = new mongoose.Schema({
 
 const incomeCollectionSchema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"User",
+    // type: String,
     required: true,
     unique: true, // Assuming one income collection per user
   },
