@@ -7,5 +7,5 @@ import { getIncomeCollection,addIncomeEntry } from "../../controllers/incomeCont
 router.get('/:userId', getIncomeCollection);
 
 // POST Add a New Income Entry
-router.post('/:userId', addIncomeEntry);
+router.post('/add-income-entry', addIncomeEntry);
 
