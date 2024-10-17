@@ -16,10 +16,10 @@ interface IExpenseCollection extends Document {
 
 const expenseEntrySchema: Schema<IExpenseEntry> = new Schema(
   {
-    // expenseId: {
-    //   type: String,
-    //   required: true,
-    // },
+    expenseId: {
+      type: String,
+      required: true,
+    },
     item: {
       type: String,
       required: true,

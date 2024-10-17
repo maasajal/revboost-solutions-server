@@ -2,14 +2,13 @@ import { Request, Response } from "express";
 import { ExpensesModel } from "../../models/expenses/expenses.model";
 
 export const getExpenses = async (req: Request, res: Response) => {
+  const { userId } = req.params; // Get the userId from the request parameters
   try {
-    const { userId } = req.params; // Get the userId from the request parameters
-
     // Find the income collection for the specified user
     const userExpenseCollection = await ExpensesModel.findOne({ userId });
 
     if (!userExpenseCollection) {
-      return res.status(404).send({ message: "Income collection not found." });
+      return res.status(404).send({ message: "Expense collection not found." });
     }
 
     // Return the income entries
@@ -36,57 +35,76 @@ export const addOrUpdateExpense = async (req: Request, res: Response) => {
   }
 
   try {
-    const existingExpenseCollection = await ExpensesModel.findOne({
-      userId,
-      userEmail,
-    });
+    const existingExpenseCollection = await ExpensesModel.findOne({ userId });
 
     if (existingExpenseCollection) {
-      const updatedExpenseCollection = await ExpensesModel.findOneAndUpdate(
-        { userId }, // Find the income collection by userId
-        { $push: { expenseEntries: { $each: expenseEntries } } }, // Use $push to add new entries to the array
-        { new: true } // Return the updated document
-      );
+      for (let entry of expenseEntries) {
+        const existingEntryIndex =
+          existingExpenseCollection.expenseEntries.findIndex(
+            (expense) => expense.expenseId === entry.expenseId
+          );
 
-      if (!updatedExpenseCollection) {
-        return res
-          .status(404)
-          .send({ message: "Income collection not found." });
+        if (existingEntryIndex !== -1) {
+          existingExpenseCollection.expenseEntries[existingEntryIndex] = {
+            ...existingExpenseCollection.expenseEntries[existingEntryIndex],
+            item: entry.item,
+            quantity: entry.quantity,
+            unitPrice: entry.unitPrice,
+            total: entry.quantity * entry.unitPrice,
+          };
+        } else {
+          // If entry doesn't exist, add it
+          existingExpenseCollection.expenseEntries.push({
+            expenseId: entry.expenseId,
+            item: entry.item,
+            quantity: entry.quantity,
+            unitPrice: entry.unitPrice,
+            total: entry.quantity * entry.unitPrice,
+          });
+        }
       }
+
+      const updatedExpenseCollection = await existingExpenseCollection.save();
+
       return res.status(200).send({
-        message: "Income entry added to existing collection",
+        message: "Expenses updated successfully",
         expenseCollection: updatedExpenseCollection,
       });
     } else {
       const newExpenseCollection = new ExpensesModel({
         userId,
         userEmail,
-        expenseEntries,
+        expenseEntries: expenseEntries.map((entry) => ({
+          expenseId: entry.expenseId,
+          item: entry.item,
+          quantity: entry.quantity,
+          unitPrice: entry.unitPrice,
+          total: entry.quantity * entry.unitPrice,
+        })),
       });
+
       const savedExpenseCollection = await newExpenseCollection.save();
 
-      res.status(201).send({
-        message: "New income collection created",
+      return res.status(201).send({
+        message: "New expense collection created",
         expenseCollection: savedExpenseCollection,
       });
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error adding/updating expense entries: ", error);
     return res.status(500).send({
-      message: "Failed to add or update income entry",
+      message: "Failed to add or update expense entries",
     });
   }
 };
 
 export const deleteExpense = async (req: Request, res: Response) => {
   try {
-    const { userId, expenseId } = req.params; // Get the userId and expenseId from the request parameters
-
-    // Find the income collection and remove the specific income entry
+    const { userId, expenseId } = req.params;
     const updatedExpenseCollection = await ExpensesModel.findOneAndUpdate(
-      { userId }, // Find by userId
-      { $pull: { expenseEntries: { expenseId } } }, // Use $pull to remove the income entry with the given expenseId
-      { new: true } // Return the updated document
+      { userId },
+      { $pull: { expenseEntries: { expenseId } } },
+      { new: true }
     );
 
     if (!updatedExpenseCollection) {
@@ -95,7 +113,6 @@ export const deleteExpense = async (req: Request, res: Response) => {
       });
     }
 
-    // Return the updated expenseEntries array
     res.status(200).send(updatedExpenseCollection.expenseEntries);
   } catch (error) {
     console.error("Error deleting income entry: ", error);
