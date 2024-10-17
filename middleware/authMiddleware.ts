@@ -28,7 +28,6 @@ export const authMiddleware = (
 ) => {
   const authorization = req.headers.authorization;
   const token = authorization?.split(" ")[1];
-  console.log(token)
   try {
     // Check if the token is missing
     if (!token) {
@@ -60,7 +59,6 @@ export const adminMiddleware = async (
   next: NextFunction
 ) => {
   const email = req?.email;
-  console.log("email:", email);
   const user = await UserModel.findOne({ email });
   if (!user) {
     res.status(403).send({ message: "messing" });
@@ -77,12 +75,15 @@ export const basicPlanMiddleware = async (
   next: NextFunction
 ) => {
   const email = req?.email;
-  const user = await UserModel.findOne({ email });
+  const user = await UserModel.findOne({ email }); 
   if (!user) {
     res.status(403).send({ message: "messing" });
   } else if (
     user.role === "admin" ||
-    (user.role === "member" && user.subscriptionPlan === "basic")
+    (user.role === "member" &&
+      (user.subscriptionPlan === "basic" ||
+        user.subscriptionPlan.toLocaleLowerCase() === "standard" ||
+        user.subscriptionPlan.toLocaleLowerCase() === "premium"))
   ) {
     next();
   } else {

@@ -17,7 +17,7 @@ export const standardPlan = async (req: Request, res: Response) => {
   try {
     res.send({ message: "admin", plan: "standard" });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({message:"error"});
   }
 };
 export const premiumPlan = async (req: Request, res: Response) => {

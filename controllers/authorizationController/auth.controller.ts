@@ -13,9 +13,11 @@ export const registerUser = async (req: Request, res: Response) => {
     if (userExists) {
       return res.status(200).send({ message: token });
     }
-    const addUser = await UserModel.create(userData);
+    const addUser = await UserModel.create(userData); 
     if (addUser) {
-      res.status(200).send({ message: token });
+      res.status(200).send({
+        message: token,
+      });
     } else {
       res.status(400).send({ message: "Invalid user data" });
     }
