@@ -1,4 +1,19 @@
-const mongoose = require("mongoose");
+import { Schema, Document, model } from "mongoose";
+
+interface IPayrollEntry {
+  employeeName: string;
+  position: string;
+  salary: number;
+  bonus: number;
+  taxDeduction: number;
+  month: string;
+}
+
+interface IPayrollCollection extends Document {
+  userId: string; // Reference to User
+  userEmail: string;
+  payrollEntries: IPayrollEntry[];
+}
 
 const MONTHS = [
   "January",
@@ -15,7 +30,7 @@ const MONTHS = [
   "December",
 ];
 
-const payrollSchema = mongoose.Schema(
+const payrollEntrySchema = new Schema<IPayrollEntry>(
   {
     employeeName: {
       type: String,
@@ -54,4 +69,24 @@ const payrollSchema = mongoose.Schema(
   }
 );
 
-module.exports = payrollSchema;
+const payrollCollectionSchema = new Schema<IPayrollCollection>(
+  {
+    userId: {
+      type: String,
+      required: true,
+    },
+    userEmail: {
+      type: String,
+      required: true,
+    },
+    payrollEntries: [payrollEntrySchema], // Array of payroll entries
+  },
+  {
+    timestamps: true, // Adds createdAt and updatedAt timestamps
+  }
+);
+
+export const PayrollModel = model<IPayrollCollection>(
+  "payrollCollections",
+  payrollCollectionSchema
+);
