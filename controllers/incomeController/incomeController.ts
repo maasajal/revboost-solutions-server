@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IncomesModel } from "../../models/companyIncomes/incomesModel";
+import { ExpensesModel } from "../../models/expenses/expenses.model";
 
 export const getIncomes = async (req: Request, res: Response) => {
   try {
@@ -36,37 +37,55 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
   }
 
   try {
-    const existingIncomeCollection = await IncomesModel.findOne({
-      userId,
-      userEmail,
-    });
+    const existingIncomeCollection = await IncomesModel.findOne({ userId });
 
     if (existingIncomeCollection) {
-      const updatedIncomeCollection = await IncomesModel.findOneAndUpdate(
-        { userId }, // Find the income collection by userId
-        { $push: { incomeEntries: { $each: incomeEntries } } }, // Use $push to add new entries to the array
-        { new: true } // Return the updated document
-      );
+      for (let entry of incomeEntries) {
+        const existingEntryIndex =
+          existingIncomeCollection.incomeEntries.findIndex(
+            (expense) => expense.incomeId === entry.incomeId
+          );
 
-      if (!updatedIncomeCollection) {
-        return res
-          .status(404)
-          .send({ message: "Income collection not found." });
+        if (existingEntryIndex !== -1) {
+          existingIncomeCollection.incomeEntries[existingEntryIndex] = {
+            ...existingIncomeCollection.incomeEntries[existingEntryIndex],
+            amount: entry.amount,
+            source: entry.source,
+            date: entry.date,
+          };
+        } else {
+          // If entry doesn't exist, add it
+          existingIncomeCollection.incomeEntries.push({
+            incomeId: entry.incomeId,
+            amount: entry.amount,
+            source: entry.source,
+            date: entry.date,
+          });
+        }
       }
+
+      const updatedIncomeCollection = await existingIncomeCollection.save();
+
       return res.status(200).send({
-        message: "Income entry added to existing collection",
+        message: "Expenses updated successfully",
         incomeCollection: updatedIncomeCollection,
       });
     } else {
       const newIncomeCollection = new IncomesModel({
         userId,
         userEmail,
-        incomeEntries,
+        incomeEntries: incomeEntries.map((entry) => ({
+          incomeId: entry.incomeId,
+          amount: entry.amount,
+          source: entry.source,
+          date: entry.date,
+        })),
       });
+
       const savedIncomeCollection = await newIncomeCollection.save();
 
-      res.status(201).send({
-        message: "New income collection created",
+      return res.status(201).send({
+        message: "New expense collection created",
         incomeCollection: savedIncomeCollection,
       });
     }
@@ -75,39 +94,6 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
     return res.status(500).send({
       message: "Failed to add or update income entry",
     });
-  }
-};
-
-export const updateIncomeEntries = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params; // Get the userId from the request parameters
-    const { incomeEntries } = req.body; // Get the income entries from the request body
-
-    // Validate request body
-    if (!incomeEntries || !Array.isArray(incomeEntries)) {
-      return res.status(400).send({
-        message: "Invalid data. Please provide valid income entries.",
-      });
-    }
-
-    // Update the incomeEntries array by adding new entries (without replacing the existing ones)
-    const updatedIncomeCollection = await IncomesModel.findOneAndUpdate(
-      { userId }, // Find the income collection by userId
-      { $push: { incomeEntries: { $each: incomeEntries } } }, // Use $push to add new entries to the array
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedIncomeCollection) {
-      return res.status(404).send({ message: "Income collection not found." });
-    }
-
-    // Respond with the updated income collection
-    res.status(200).send(updatedIncomeCollection);
-  } catch (error) {
-    console.error("Error updating income entries: ", error);
-    res
-      .status(500)
-      .send({ message: "Server error. Could not update income entries." });
   }
 };
 
