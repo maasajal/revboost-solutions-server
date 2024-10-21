@@ -4,6 +4,7 @@ import {
   IIncomeEntry,
   IncomesModel,
 } from "../../models/companyIncomes/incomesModel";
+import { revenueGrowth } from "./revenue.controller";
 
 export const getRevenueData = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -118,6 +119,78 @@ export const calculateMonthlyRevenue = async (req: Request, res: Response) => {
       currentMonthRevenue,
       previousMonthRevenue,
       growth: growth.toFixed(2) + "%",
+    });
+  } catch (error) {
+    console.error("Error calculating revenue growth:", error);
+    res.status(500).send({ message: "Server error" });
+  }
+};
+
+export const calculateQuarterlyRevenue = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.params.id;
+    const userIncome = await IncomesModel.findOne({ userId });
+    if (!userIncome) {
+      return res
+        .status(404)
+        .send({ message: "No income data found for the user." });
+    }
+
+    const getQuarter = (date: Date): string => {
+      const month = date.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+      const year = date.getFullYear();
+
+      // Determine the quarter based on the month
+      if (month >= 1 && month <= 3) return `${year}-Q1`;
+      if (month >= 4 && month <= 6) return `${year}-Q2`;
+      if (month >= 7 && month <= 9) return `${year}-Q3`;
+      return `${year}-Q4`; // months 10-12 fall in Q4
+    };
+
+    const incomeByQuarter = userIncome.incomeEntries.reduce(
+      (acc: { [key: string]: number }, entry: IIncomeEntry) => {
+        // Get the quarter for each income entry
+        const quarter = getQuarter(new Date(entry.date));
+
+        // Initialize the quarter if it doesn't exist in the accumulator
+        if (!acc[quarter]) {
+          acc[quarter] = 0;
+        }
+
+        // Sum the income for the respective quarter
+        acc[quarter] += entry.amount;
+
+        return acc;
+      },
+      {}
+    );
+
+    const quarters = Object.keys(incomeByQuarter).sort();
+    if (quarters.length < 2) {
+      return res
+        .status(400)
+        .send({ message: "Not enough data to calculate growth." });
+    }
+
+    const currentQuarterRevenue =
+      incomeByQuarter[quarters[quarters.length - 1]];
+    const previousQuarterRevenue =
+      incomeByQuarter[quarters[quarters.length - 2]];
+
+    const growth =
+      ((currentQuarterRevenue - previousQuarterRevenue) /
+        previousQuarterRevenue) *
+      100;
+
+    return res.status(200).send({
+      currentQuarter: quarters[quarters.length - 1],
+      previousQuarter: quarters[quarters.length - 2],
+      currentQuarterRevenue,
+      previousQuarterRevenue,
+      revenueGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
