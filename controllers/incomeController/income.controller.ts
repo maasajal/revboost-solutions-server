@@ -31,6 +31,7 @@ export const addIncomeEntry = async (req: Request, res: Response) =>{
         userEmail, // Ensure userEmail is sent in the request
         incomeEntries: [],
       });
+      console.log(incomeCollection)
     }
 
     // Add new income entry

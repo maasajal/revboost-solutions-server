@@ -5,6 +5,7 @@ const invoiceSchema = new mongoose.Schema({
   customerName: String,
   companyName: String,
   invoiceNumber: String,
+  invoiceDueDate: String,
   date: String,
   customerAddress: String,
   items: [
