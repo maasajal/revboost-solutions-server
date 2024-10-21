@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import { RevenueModel } from "../../models/revenueGrowth/revenueGrowthCollection";
+import {
+  IIncomeEntry,
+  IncomesModel,
+} from "../../models/companyIncomes/incomesModel";
 
 export const getRevenueData = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -67,10 +71,56 @@ export const addOrUpdateRevenue = async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error("Error adding or updating revenue entries: ", error);
-    res
-      .status(500)
-      .send({
-        message: "Server error. Could not add or update revenue entries.",
-      });
+    res.status(500).send({
+      message: "Server error. Could not add or update revenue entries.",
+    });
+  }
+};
+
+export const calculateMonthlyRevenue = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const userIncome = await IncomesModel.findOne({ userId });
+    if (!userIncome) {
+      return res
+        .status(404)
+        .send({ message: "No income data found for the user." });
+    }
+
+    const incomeByMonth = userIncome.incomeEntries.reduce(
+      (acc: { [key: string]: number }, entry: IIncomeEntry) => {
+        const yearMonth = new Date(entry.date).toISOString().slice(0, 7);
+
+        if (!acc[yearMonth]) {
+          acc[yearMonth] = 0;
+        }
+        acc[yearMonth] += entry.amount;
+        return acc;
+      },
+      {}
+    );
+
+    const months = Object.keys(incomeByMonth).sort();
+    if (months.length < 2) {
+      return res
+        .status(400)
+        .send({ message: "Not enough data to calculate growth." });
+    }
+
+    const currentMonthRevenue = incomeByMonth[months[months.length - 1]];
+    const previousMonthRevenue = incomeByMonth[months[months.length - 2]];
+
+    const growth =
+      ((currentMonthRevenue - previousMonthRevenue) / previousMonthRevenue) *
+      100;
+
+    return res.status(200).send({
+      currentMonthRevenue,
+      previousMonthRevenue,
+      growth: growth.toFixed(2) + "%",
+    });
+  } catch (error) {
+    console.error("Error calculating revenue growth:", error);
+    res.status(500).send({ message: "Server error" });
   }
 };

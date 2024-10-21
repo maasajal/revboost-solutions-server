@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types, ObjectId, model } from "mongoose";
 
-interface IIncomeEntry {
+export interface IIncomeEntry {
   incomeId: string;
   amount: number;
   source: string;
