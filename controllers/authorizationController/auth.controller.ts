@@ -11,9 +11,9 @@ export const registerUser = async (req: Request, res: Response) => {
     const token = generateToken(email);
 
     if (userExists) {
-      return res.status(200).send({ message: token });
+      return res.status(200).send({ message: token, subscriptionStatus: userExists.subscriptionStatus });
     }
-    const addUser = await UserModel.create(userData); 
+    const addUser = await UserModel.create(userData);
     if (addUser) {
       res.status(200).send({
         message: token,
