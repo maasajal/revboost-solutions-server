@@ -11,7 +11,7 @@ export const getPayroll = async (req: Request, res: Response) => {
     // Check if userPayrollCollection is null
     if (!userPayrollCollection) {
       return res.status(404).json({
-        message: "Payroll data not found for the specified user.",
+        message: "Payroll data not found for the specified user",
       });
     }
 
