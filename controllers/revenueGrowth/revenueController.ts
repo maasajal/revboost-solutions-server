@@ -4,7 +4,6 @@ import {
   IIncomeEntry,
   IncomesModel,
 } from "../../models/companyIncomes/incomesModel";
-import { revenueGrowth } from "./revenue.controller";
 
 export const getRevenueData = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -249,6 +248,62 @@ export const calculateHalfYearRevenue = async (req: Request, res: Response) => {
       previousHalfYear: halfYears[halfYears.length - 2],
       currentHalfYearRevenue,
       previousHalfYearRevenue,
+      revenueGrowth: growth.toFixed(2) + "%",
+    });
+  } catch (error) {
+    console.error("Error calculating revenue growth:", error);
+    res.status(500).send({ message: "Server error" });
+  }
+};
+
+export const calculateYearlyRevenue = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const userIncome = await IncomesModel.findOne({ userId });
+    if (!userIncome) {
+      return res
+        .status(404)
+        .send({ message: "No income data found for the user." });
+    }
+    const getYear = (date: Date): string => {
+      const year = date.getFullYear();
+      return `${year}`;
+    };
+
+    const incomeByYear = userIncome.incomeEntries.reduce(
+      (acc: { [key: string]: number }, entry: IIncomeEntry) => {
+        const year = getYear(new Date(entry.date));
+
+        if (!acc[year]) {
+          acc[year] = 0;
+        }
+
+        acc[year] += entry.amount;
+
+        return acc;
+      },
+      {}
+    );
+
+    const years = Object.keys(incomeByYear).sort();
+
+    if (years.length < 2) {
+      return res
+        .status(400)
+        .send({ message: "Not enough data to calculate growth." });
+    }
+
+    const currentYearRevenue = incomeByYear[years[years.length - 1]];
+    const previousYearRevenue = incomeByYear[years[years.length - 2]];
+
+    const growth =
+      ((currentYearRevenue - previousYearRevenue) / previousYearRevenue) * 100;
+
+    return res.status(200).send({
+      currentHalfYear: years[years.length - 1],
+      previousHalfYear: years[years.length - 2],
+      currentYearRevenue,
+      previousYearRevenue,
       revenueGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
