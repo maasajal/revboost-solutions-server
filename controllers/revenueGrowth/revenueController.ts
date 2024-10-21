@@ -140,27 +140,23 @@ export const calculateQuarterlyRevenue = async (
     }
 
     const getQuarter = (date: Date): string => {
-      const month = date.getMonth() + 1; // getMonth() returns 0-11, so we add 1
+      const month = date.getMonth() + 1;
       const year = date.getFullYear();
 
-      // Determine the quarter based on the month
-      if (month >= 1 && month <= 3) return `${year}-Q1`;
-      if (month >= 4 && month <= 6) return `${year}-Q2`;
-      if (month >= 7 && month <= 9) return `${year}-Q3`;
-      return `${year}-Q4`; // months 10-12 fall in Q4
+      if (month >= 1 && month <= 3) return `${year} January to March`;
+      if (month >= 4 && month <= 6) return `${year} April to June`;
+      if (month >= 7 && month <= 9) return `${year} July to September`;
+      return `${year} October to December`;
     };
 
     const incomeByQuarter = userIncome.incomeEntries.reduce(
       (acc: { [key: string]: number }, entry: IIncomeEntry) => {
-        // Get the quarter for each income entry
         const quarter = getQuarter(new Date(entry.date));
 
-        // Initialize the quarter if it doesn't exist in the accumulator
         if (!acc[quarter]) {
           acc[quarter] = 0;
         }
 
-        // Sum the income for the respective quarter
         acc[quarter] += entry.amount;
 
         return acc;
@@ -190,6 +186,69 @@ export const calculateQuarterlyRevenue = async (
       previousQuarter: quarters[quarters.length - 2],
       currentQuarterRevenue,
       previousQuarterRevenue,
+      revenueGrowth: growth.toFixed(2) + "%",
+    });
+  } catch (error) {
+    console.error("Error calculating revenue growth:", error);
+    res.status(500).send({ message: "Server error" });
+  }
+};
+
+export const calculateHalfYearRevenue = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id;
+    const userIncome = await IncomesModel.findOne({ userId });
+    if (!userIncome) {
+      return res
+        .status(404)
+        .send({ message: "No income data found for the user." });
+    }
+    const getHalfYear = (date: Date): string => {
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+
+      if (month >= 1 && month <= 6) return `${year} January to June`;
+      return `${year} July to December`;
+    };
+
+    const incomeByHalfYear = userIncome.incomeEntries.reduce(
+      (acc: { [key: string]: number }, entry: IIncomeEntry) => {
+        const halfYear = getHalfYear(new Date(entry.date));
+
+        if (!acc[halfYear]) {
+          acc[halfYear] = 0;
+        }
+
+        acc[halfYear] += entry.amount;
+
+        return acc;
+      },
+      {}
+    );
+
+    const halfYears = Object.keys(incomeByHalfYear).sort();
+
+    if (halfYears.length < 2) {
+      return res
+        .status(400)
+        .send({ message: "Not enough data to calculate growth." });
+    }
+
+    const currentHalfYearRevenue =
+      incomeByHalfYear[halfYears[halfYears.length - 1]];
+    const previousHalfYearRevenue =
+      incomeByHalfYear[halfYears[halfYears.length - 2]];
+
+    const growth =
+      ((currentHalfYearRevenue - previousHalfYearRevenue) /
+        previousHalfYearRevenue) *
+      100;
+
+    return res.status(200).send({
+      currentHalfYear: halfYears[halfYears.length - 1],
+      previousHalfYear: halfYears[halfYears.length - 2],
+      currentHalfYearRevenue,
+      previousHalfYearRevenue,
       revenueGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
