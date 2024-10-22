@@ -29,6 +29,10 @@ const incomeEntrySchema: Schema<IIncomeEntry> = new Schema(
       type: String,
       required: true,
     },
+    date: {
+      type: Date,
+      required: true,
+    },
     vat_status: {
       type: String,
     },
