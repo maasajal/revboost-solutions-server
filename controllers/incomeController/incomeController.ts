@@ -1,19 +1,16 @@
 import { Request, Response } from "express";
 import { IncomesModel } from "../../models/companyIncomes/incomesModel";
-import { ExpensesModel } from "../../models/expenses/expenses.model";
 
 export const getIncomes = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params; // Get the userId from the request parameters
+    const { userId } = req.params;
 
-    // Find the income collection for the specified user
     const userIncomeCollection = await IncomesModel.findOne({ userId });
 
     if (!userIncomeCollection) {
       return res.status(404).send({ message: "Income collection not found." });
     }
 
-    // Return the income entries
     res.status(200).send(userIncomeCollection.incomeEntries);
   } catch (error) {
     console.error("Error retrieving income entries: ", error);
@@ -52,14 +49,17 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
             amount: entry.amount,
             source: entry.source,
             date: entry.date,
+            vat_status: "pending",
+            tax_status: "pending",
           };
         } else {
-          // If entry doesn't exist, add it
           existingIncomeCollection.incomeEntries.push({
             incomeId: entry.incomeId,
             amount: entry.amount,
             source: entry.source,
             date: entry.date,
+            vat_status: "pending",
+            tax_status: "pending",
           });
         }
       }
@@ -79,6 +79,8 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
           amount: entry.amount,
           source: entry.source,
           date: entry.date,
+          vat_status: "pending",
+          tax_status: "pending",
         })),
       });
 
