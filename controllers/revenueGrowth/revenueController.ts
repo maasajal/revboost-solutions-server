@@ -248,7 +248,7 @@ export const calculateHalfYearRevenue = async (req: Request, res: Response) => {
       previousHalfYear: halfYears[halfYears.length - 2],
       currentHalfYearRevenue,
       previousHalfYearRevenue,
-      revenueGrowth: growth.toFixed(2) + "%",
+      halfYearlyGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
@@ -300,11 +300,11 @@ export const calculateYearlyRevenue = async (req: Request, res: Response) => {
       ((currentYearRevenue - previousYearRevenue) / previousYearRevenue) * 100;
 
     return res.status(200).send({
-      currentHalfYear: years[years.length - 1],
-      previousHalfYear: years[years.length - 2],
+      currentYear: years[years.length - 1],
+      previousYear: years[years.length - 2],
       currentYearRevenue,
       previousYearRevenue,
-      revenueGrowth: growth.toFixed(2) + "%",
+      yearlyGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
