@@ -5,6 +5,8 @@ export interface IIncomeEntry {
   amount: number;
   source: string;
   date: Date;
+  vat_status: string;
+  tax_status: string;
 }
 
 interface IIncomeCollection extends Document {
@@ -27,9 +29,11 @@ const incomeEntrySchema: Schema<IIncomeEntry> = new Schema(
       type: String,
       required: true,
     },
-    date: {
-      type: Date,
-      required: true,
+    vat_status: {
+      type: String,
+    },
+    tax_status: {
+      type: String,
     },
   },
   {
