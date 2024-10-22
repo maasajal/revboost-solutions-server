@@ -117,7 +117,7 @@ export const calculateMonthlyRevenue = async (req: Request, res: Response) => {
     return res.status(200).send({
       currentMonthRevenue,
       previousMonthRevenue,
-      growth: growth.toFixed(2) + "%",
+      monthlyGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
@@ -185,7 +185,7 @@ export const calculateQuarterlyRevenue = async (
       previousQuarter: quarters[quarters.length - 2],
       currentQuarterRevenue,
       previousQuarterRevenue,
-      revenueGrowth: growth.toFixed(2) + "%",
+      quarterlyGrowth: growth.toFixed(2) + "%",
     });
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
