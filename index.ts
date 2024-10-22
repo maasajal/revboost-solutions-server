@@ -6,14 +6,15 @@ import expenseAddressRoute from "./routes/expense.address.route";
 import expenseRouter from "./routes/expense.route";
 import invoiceRouter from "./routes/invoiceRoutes/invoice.routes";
 // income
-import incomeRoutes from "./routes/invoiceRoutes/invoice.routes";
-import incomesRoutes from "./routes/incomeRoutes/incomeRoutes";
 import expensesRoutes from "./routes/expenses/expenseRoutes";
+import incomesRoutes from "./routes/incomeRoutes/incomeRoutes";
+import incomeRoutes from "./routes/invoiceRoutes/invoice.routes";
 import payrollRouter from "./routes/payroll/payroll.routes";
 import revenueRouter from "./routes/revenueGrowth/revenue.routes";
 
-import priceRouter from "./routes/pricing/pricing.router";
+import customerMessage from "./routes/customerMessageRoutes/customerMessageRoutes";
 import paymentRoutes from "./routes/payment/payment.routes";
+import priceRouter from "./routes/pricing/pricing.router";
 
 const cors = require("cors");
 
@@ -55,6 +56,8 @@ app.use("/api/v1/payroll", payrollRouter);
 app.use("/api/v1/pricing", priceRouter);
 // payment sslcommerz
 app.use("/api/v1/payment", paymentRoutes);
+// Contact Us form data 
+app.use("/api/v1", customerMessage)
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
