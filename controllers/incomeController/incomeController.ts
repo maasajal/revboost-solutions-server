@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import { IncomesModel } from "../../models/companyIncomes/incomesModel";
 
 const getMonthIndex = (monthName: string): number => {
@@ -18,6 +19,25 @@ const getMonthIndex = (monthName: string): number => {
   ];
   return months.indexOf(monthName); // Returns -1 if monthName is invalid
 };
+interface IIncomeEntry {
+  _id: mongoose.Types.ObjectId; // অথবা string, যদি আপনি string হিসাবে ID ব্যবহার করেন
+  incomeId: string;
+  amount: number;
+  source: string;
+  date: Date;
+  vat_status: string;
+  tax_status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+interface IIncomesModel {
+  _id: mongoose.Types.ObjectId; // অথবা string
+  userId: string;
+  userEmail: string;
+  incomeEntries: IIncomeEntry[]; // IIncomeEntry টাইপ ব্যবহার করুন
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export const getIncomes = async (req: Request, res: Response) => {
   try {
@@ -78,6 +98,7 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
             date: entry.date,
             vat_status: "pending",
             tax_status: "pending",
+            vat_amount: 0,
           });
         }
       }
@@ -199,14 +220,56 @@ export const filterIncomeEntriesByDate = async (
       const incomeEntries = result[0].incomeEntries; // Extract the incomeEntries
       res.status(200).json({ incomeEntries }); // Send the filtered entries
     } else {
-      res
-        .status(404)
-        .json({
-          message: "No income entries found for the given month and year.",
-        });
+      res.status(404).json({
+        message: "No income entries found for the given month and year.",
+      });
     }
   } catch (error) {
     console.error("Error filtering income entries:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const incomeStatusWithVat = async (req: Request, res: Response) => {
+  const userId = req.body.userId; // ব্যবহারকারীর আইডি নিন
+  const incomeEntryId = req.body.productId; // ইনকাম এন্ট্রির আইডি নিন
+  const newAmount = req.body.newAmount; // নতুন পরিমাণ নিন
+  const newVatStatus = req.body.newVatStatus; // নতুন ভ্যাট স্ট্যাটাস নিন
+
+  try {
+    // ব্যবহারকারী ডেটা খুঁজুন
+    const findUser = await IncomesModel.findById(userId);
+
+    if (findUser?.incomeEntries) {
+      const incomeEntry = findUser.incomeEntries.find(
+        (entry) => entry.incomeId === incomeEntryId
+      );
+      const vat = (incomeEntry?.amount || 100 * 15) / 100;
+      const newAmount = (incomeEntry?.amount || 100) - vat;
+      console.log(newAmount);
+
+      if (incomeEntry) {
+        // You can now access and update the `incomeEntry`
+        incomeEntry.amount = newAmount;
+        incomeEntry.vat_amount = vat;
+        incomeEntry.vat_status = "success";
+
+        await findUser.save();
+
+        return res.send({
+          message: "Income entry updated successfully",
+          data: incomeEntry,
+        });
+      } else {
+        return res
+          .status(404)
+          .send({ message: "No income entry found with that ID" });
+      }
+    } else {
+      return res.status(404).send({ message: "No data found" });
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    return res.status(500).send({ message: "Internal server error" });
   }
 };
