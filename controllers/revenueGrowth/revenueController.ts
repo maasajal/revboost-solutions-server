@@ -4,7 +4,7 @@ import {
   IIncomeEntry,
   IncomesModel,
 } from "../../models/companyIncomes/incomesModel";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { ExpensesModel } from "../../models/expenses/expenses.model";
 
 export const getRevenueData = async (req: Request, res: Response) => {
@@ -326,44 +326,47 @@ export const calculateTotalRevenueGrowth = async (
     }
 
     const userIncome = await IncomesModel.findOne({ userId });
-    console.log("total", userIncome)
     if (!userIncome) {
       return res
         .status(404)
         .send({ message: "No income data found for the user." });
     }
 
-    const totalIncome = await IncomesModel.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      { $group: { _id: null, totalIncome: { $sum: "$amount" } } }, // Ensure $amount is correct
-    ]);
-
-    const totalExpenses = await ExpensesModel.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-      { $group: { _id: null, totalExpenses: { $sum: "$total" } } }, // Ensure $total is correct
-    ]);
-
-    const totalIncomeValue =
-      totalIncome.length > 0 ? totalIncome[0].totalIncome : 0;
-    const totalExpensesValue =
-      totalExpenses.length > 0 ? totalExpenses[0].totalExpenses : 0;
-
-    let growthPercentage = 0;
-    if (totalExpensesValue > 0) {
-      growthPercentage =
-        ((totalIncomeValue - totalExpensesValue) / totalExpensesValue) * 100;
+    const userExpenses = await ExpensesModel.findOne({ userId });
+    if (!userExpenses) {
+      return res
+        .status(404)
+        .send({ message: "No expenses data found for the user." });
     }
 
-    const forecast = totalIncomeValue * 1.1;
+    // Calculate total income
+    const totalIncome = userIncome.incomeEntries.reduce(
+      (acc, entry) => acc + entry.amount,
+      0
+    );
 
-    res.status(200).send({
-      totalIncome: totalIncomeValue,
-      totalExpenses: totalExpensesValue,
-      growthPercentage,
-      forecast,
+    // Calculate total expenses
+    const totalExpenses = userExpenses.expenseEntries.reduce(
+      (acc, entry) => acc + entry.total,
+      0
+    );
+
+    // Calculate the growth percentage
+    let growthPercentage = 0;
+    if (totalExpenses > 0) {
+      growthPercentage = ((totalIncome - totalExpenses) / totalExpenses) * 100;
+    }
+    // Calculate the forecast
+    const forecast = totalIncome * 1.1;
+
+    return res.status(200).send({
+      totalIncome,
+      totalExpenses,
+      growthPercentage: growthPercentage.toFixed(2) + "%",
+      forecast: forecast.toFixed(2),
     });
   } catch (error) {
-    console.error("Error calculating revenue growth:", error);
-    res.status(500).send({ message: "Server Error" });
+    console.error("Error calculating total revenue growth:", error);
+    return res.status(500).send({ message: "Server error" });
   }
 };
