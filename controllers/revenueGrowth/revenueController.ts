@@ -4,6 +4,8 @@ import {
   IIncomeEntry,
   IncomesModel,
 } from "../../models/companyIncomes/incomesModel";
+import mongoose from "mongoose";
+import { ExpensesModel } from "../../models/expenses/expenses.model";
 
 export const getRevenueData = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -309,5 +311,59 @@ export const calculateYearlyRevenue = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error calculating revenue growth:", error);
     res.status(500).send({ message: "Server error" });
+  }
+};
+
+export const calculateTotalRevenueGrowth = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({ message: "Invalid User ID" });
+    }
+
+    const userIncome = await IncomesModel.findOne({ userId });
+    console.log("total", userIncome)
+    if (!userIncome) {
+      return res
+        .status(404)
+        .send({ message: "No income data found for the user." });
+    }
+
+    const totalIncome = await IncomesModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $group: { _id: null, totalIncome: { $sum: "$amount" } } }, // Ensure $amount is correct
+    ]);
+
+    const totalExpenses = await ExpensesModel.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $group: { _id: null, totalExpenses: { $sum: "$total" } } }, // Ensure $total is correct
+    ]);
+
+    const totalIncomeValue =
+      totalIncome.length > 0 ? totalIncome[0].totalIncome : 0;
+    const totalExpensesValue =
+      totalExpenses.length > 0 ? totalExpenses[0].totalExpenses : 0;
+
+    let growthPercentage = 0;
+    if (totalExpensesValue > 0) {
+      growthPercentage =
+        ((totalIncomeValue - totalExpensesValue) / totalExpensesValue) * 100;
+    }
+
+    const forecast = totalIncomeValue * 1.1;
+
+    res.status(200).send({
+      totalIncome: totalIncomeValue,
+      totalExpenses: totalExpensesValue,
+      growthPercentage,
+      forecast,
+    });
+  } catch (error) {
+    console.error("Error calculating revenue growth:", error);
+    res.status(500).send({ message: "Server Error" });
   }
 };

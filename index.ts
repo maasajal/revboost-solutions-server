@@ -40,7 +40,7 @@ app.use("/api/v1", authRouter);
 app.use("/api/v1", authorization);
 // Features routers | please use this format = app.use("/api/v1", <yourRouter>);
 
-app.use("/api/v1/expenses", expensesRoutes);
+app.use("/api/v1/expenses", expensesRoutes); //need work
 app.use("/api/v1/expense", expenseRouter);
 app.use("/api/v1/address", expenseAddressRoute);
 // income
@@ -54,10 +54,11 @@ app.use("/api/v1/payroll", payrollRouter);
 
 // pricing
 app.use("/api/v1/pricing", priceRouter);
-// payment sslcommerz
-app.use("/api/v1/payment", paymentRoutes);
-// Contact Us form data 
+// Contact Us form data
 app.use("/api/v1", customerMessage)
+// app.use("/api/v1/payment", paymentRoutes);
+// payment stripe method
+app.use("/api/v1/payments", paymentRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });

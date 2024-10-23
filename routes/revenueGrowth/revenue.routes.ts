@@ -5,6 +5,7 @@ import {
   calculateHalfYearRevenue,
   calculateMonthlyRevenue,
   calculateQuarterlyRevenue,
+  calculateTotalRevenueGrowth,
   calculateYearlyRevenue,
   getRevenueData,
 } from "../../controllers/revenueGrowth/revenueController";
@@ -19,5 +20,6 @@ router.get("/monthly-revenue/:id", calculateMonthlyRevenue);
 router.get("/quarterly-revenue/:id", calculateQuarterlyRevenue);
 router.get("/half-year-revenue/:id", calculateHalfYearRevenue);
 router.get("/yearly-revenue/:id", calculateYearlyRevenue);
+router.get("/total-revenue/:id", calculateTotalRevenueGrowth);
 
 export default router;
