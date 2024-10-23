@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types, ObjectId, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export interface IIncomeEntry {
   incomeId: string;
@@ -7,6 +7,7 @@ export interface IIncomeEntry {
   date: Date;
   vat_status: string;
   tax_status: string;
+  vat_amount: number;
 }
 
 interface IIncomeCollection extends Document {
@@ -38,6 +39,9 @@ const incomeEntrySchema: Schema<IIncomeEntry> = new Schema(
     },
     tax_status: {
       type: String,
+    },
+    vat_amount: {
+      type: Number,
     },
   },
   {
