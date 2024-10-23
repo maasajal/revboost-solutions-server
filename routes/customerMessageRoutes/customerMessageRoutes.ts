@@ -5,15 +5,27 @@ import {
     getSinglePersonMessage,
     updateReadStatus,
 } from "../../controllers/customerMessageController/customerMessageController";
-// import {
-//     adminMiddleware,
-//     authMiddleware,
-// } from "../../middleware/authMiddleware";
+import {
+    adminMiddleware,
+    authMiddleware,
+} from "../../middleware/authMiddleware";
 const router: Router = express.Router();
 
-router.route("/messages").get(getAllMessage);
-router.route("/messages/:id").get(getSinglePersonMessage); 
-router.patch('/messages/read-status', updateReadStatus);
-router.route("/messages").post(createMessage);
+router.get("/messages", authMiddleware, adminMiddleware, getAllMessage);
+
+router.post("/messages", createMessage);
+
+router.get(
+  "/messages/:id",
+  authMiddleware,
+  adminMiddleware,
+  getSinglePersonMessage
+);
+router.patch(
+  "/messages/read-status",
+  authMiddleware,
+  adminMiddleware,
+  updateReadStatus
+);
 
 export default router;
