@@ -54,7 +54,9 @@ app.use("/api/v1/payroll", payrollRouter);
 // pricing
 app.use("/api/v1/pricing", priceRouter);
 // payment sslcommerz
-app.use("/api/v1/payment", paymentRoutes);
+// app.use("/api/v1/payment", paymentRoutes);
+// payment stripe method
+app.use("/api/v1/payments", paymentRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ message: "Welcome to the RevBoost Solutions server!" });
