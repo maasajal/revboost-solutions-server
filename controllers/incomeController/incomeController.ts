@@ -1,6 +1,24 @@
 import { Request, Response } from "express";
 import { IncomesModel } from "../../models/companyIncomes/incomesModel";
 
+const getMonthIndex = (monthName: string): number => {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return months.indexOf(monthName); // Returns -1 if monthName is invalid
+};
+
 export const getIncomes = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -101,7 +119,7 @@ export const addOrUpdateIncome = async (req: Request, res: Response) => {
 
 export const deleteIncome = async (req: Request, res: Response) => {
   try {
-    const { userId, incomeId } = req.params; // Get the userId and incomeId from the request parameters
+    const { userId, incomeId } = req.query; // Get the userId and incomeId from the request parameters
 
     // Find the income collection and remove the specific income entry
     const updatedIncomeCollection = await IncomesModel.findOneAndUpdate(
@@ -123,5 +141,72 @@ export const deleteIncome = async (req: Request, res: Response) => {
     res
       .status(500)
       .send({ message: "Server error. Could not delete income entry." });
+  }
+};
+
+interface QueryData {
+  userId: string;
+  selectedMonth: string;
+  selectedYear: number;
+}
+
+// Function to filter income entries by date
+export const filterIncomeEntriesByDate = async (
+  req: Request,
+  res: Response
+) => {
+  const { selectedMonth, userId, selectedYear } = req.body;
+
+  if (!selectedMonth || selectedYear === "null") {
+    const userIncomeCollection = await IncomesModel.findOne({ userId });
+    res.send(userIncomeCollection);
+    return;
+  }
+
+  try {
+    // Get the month index from the month name
+    const monthIndex = getMonthIndex(selectedMonth);
+    if (monthIndex === -1) {
+      throw new Error("Invalid month name provided.");
+    }
+
+    // Adjust the month index to match MongoDB's month index (1-based)
+    const adjustedMonthIndex = monthIndex + 1;
+
+    // MongoDB aggregation query to filter the income entries
+    const result = await IncomesModel.aggregate([
+      { $match: { userId } },
+      {
+        $project: {
+          incomeEntries: {
+            $filter: {
+              input: "$incomeEntries",
+              as: "entry",
+              cond: {
+                $and: [
+                  { $eq: [{ $year: "$$entry.date" }, selectedYear] },
+                  { $eq: [{ $month: "$$entry.date" }, adjustedMonthIndex] },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    // If you want to return only the incomeEntries array
+    if (result.length > 0) {
+      const incomeEntries = result[0].incomeEntries; // Extract the incomeEntries
+      res.status(200).json({ incomeEntries }); // Send the filtered entries
+    } else {
+      res
+        .status(404)
+        .json({
+          message: "No income entries found for the given month and year.",
+        });
+    }
+  } catch (error) {
+    console.error("Error filtering income entries:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
