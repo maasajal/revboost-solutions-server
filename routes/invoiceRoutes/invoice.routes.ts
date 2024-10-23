@@ -5,5 +5,6 @@ const router = express.Router();
 router.post("/create", createInvoices)
 router.get("/all", allInvoices)
 
+router.get("/create/:id", getIndividualInvoice);
 
 export default router
