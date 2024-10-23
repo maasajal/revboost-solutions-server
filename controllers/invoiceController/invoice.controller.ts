@@ -46,3 +46,30 @@ export const allInvoices = async (req: Request, res: Response) => {
     res.status(500).send(error);
   }
 };
+
+export const getIndividualInvoice = async (req: Request, res: Response) => {
+  try {
+
+    const incomeId = req.params.id;
+    const invoice = await InvoiceModel.findById(incomeId);
+    if (!invoice) {
+        return res.status(404).json({ message: "Expense not found" });
+    }
+    res.status(200).json({
+        message: "Expense retrieved successfully",
+        data: invoice,
+    });
+} catch (error: unknown) {
+    if (error instanceof Error) {
+        res.status(500).json({
+            message: "Error retrieving expense",
+            error: error.message,
+        });
+    } else {
+        res.status(500).json({
+            message: "An unknown error occurred",
+        });
+    }
+}
+
+}
