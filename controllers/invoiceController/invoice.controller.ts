@@ -53,16 +53,16 @@ export const getIndividualInvoice = async (req: Request, res: Response) => {
     const incomeId = req.params.id;
     const invoice = await InvoiceModel.findById(incomeId);
     if (!invoice) {
-        return res.status(404).json({ message: "Expense not found" });
+        return res.status(404).json({ message: "invoice not found" });
     }
     res.status(200).json({
-        message: "Expense retrieved successfully",
+        message: "invoice retrieved successfully",
         data: invoice,
     });
 } catch (error: unknown) {
     if (error instanceof Error) {
         res.status(500).json({
-            message: "Error retrieving expense",
+            message: "Error retrieving invoice",
             error: error.message,
         });
     } else {
@@ -73,3 +73,29 @@ export const getIndividualInvoice = async (req: Request, res: Response) => {
 }
 
 }
+
+export const deleteIndividualInvoice = async (req: Request, res: Response) => {
+  try {
+      const incomeId = req.params.id;
+      const deletedInvoice = await InvoiceModel.findByIdAndDelete(incomeId);
+      if (!deletedInvoice) {
+          return res.status(404).json({ message: "invoice not found" });
+      }
+
+      res.status(200).json({
+          message: "invoice deleted successfully",
+          data: deletedInvoice,
+        });
+  } catch (error: unknown) {
+      if (error instanceof Error) {
+          res.status(500).json({
+              message: "Error deleting individual invoice",
+              error: error.message,
+          });
+      } else {
+          res.status(500).json({
+              message: "An unknown error occurred",
+          });
+      }
+  }
+};
