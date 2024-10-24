@@ -1,6 +1,23 @@
 import { Request, Response } from "express";
-import PaymentModel from "../../models/paymentModel/payment.model";
-import { ExpensesModel } from "../../models/expenses/expenses.model";
+import PaymentsModel from "../../models/paymentModel/payment.model";
+
+export const getPayments = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  try {
+    const userPaymentCollection = await PaymentsModel.findOne({ userId });
+
+    if (!userPaymentCollection) {
+      return res.status(404).send({ message: "Payment collection not found." });
+    }
+
+    res.status(200).send(userPaymentCollection.paymentEntries);
+  } catch (error) {
+    console.error("Error retrieving payment entries: ", error);
+    res
+      .status(500)
+      .send({ message: "Server error. Could not retrieve payment entries." });
+  }
+};
 
 // Save payment details
 export const savePaymentDetails = async (req: Request, res: Response) => {
@@ -17,12 +34,11 @@ export const savePaymentDetails = async (req: Request, res: Response) => {
   }
 
   try {
-    const existingPayment = await PaymentModel.findOne({ userId });
-
+    const existingPayment = await PaymentsModel.findOne({ userId });
     if (existingPayment) {
       for (let entry of paymentEntries) {
         const existingEntryIndex = existingPayment.paymentEntries.findIndex(
-          (expense) => expense.transactionId === entry.transactionId
+          (payment) => payment.transactionId === entry.transactionId
         );
 
         if (existingEntryIndex !== -1) {
@@ -49,11 +65,11 @@ export const savePaymentDetails = async (req: Request, res: Response) => {
       const updatedPaymentCollection = await existingPayment.save();
 
       return res.status(200).send({
-        message: "Expenses updated successfully",
+        message: "Payment updated successfully",
         paymentCollection: updatedPaymentCollection,
       });
     } else {
-      const newPaymentCollection = new ExpensesModel({
+      const newPaymentCollection = new PaymentsModel({
         userId,
         userEmail,
         paymentEntries: paymentEntries.map((entry) => ({
@@ -68,7 +84,7 @@ export const savePaymentDetails = async (req: Request, res: Response) => {
       const savedPaymentCollection = await newPaymentCollection.save();
 
       return res.status(201).send({
-        message: "New expense collection created",
+        message: "New payment collection created",
         paymentCollection: savedPaymentCollection,
       });
     }

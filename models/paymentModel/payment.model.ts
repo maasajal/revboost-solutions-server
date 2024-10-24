@@ -15,48 +15,58 @@ interface PaymentDocument extends Document {
 }
 
 // Mongoose Payment Schema
-const paymentEntrySchema = new Schema<IPaymentEntry>({
-  transactionId: {
-    type: String,
-    required: true,
-    unique: true,
+const paymentEntrySchema = new Schema<IPaymentEntry>(
+  {
+    transactionId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    payment_status: {
+      type: String,
+      required: true,
+      default: "pending",
+    },
+    paymentDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+    due_date: {
+      type: Date,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
   },
-  payment_status: {
-    type: String,
-    required: true,
-    default: "pending",
-  },
-  paymentDate: {
-    type: Date,
-    required: true,
-    default: Date.now,
-  },
-  due_date: {
-    type: Date,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
-const PaymentSchema = new Schema<PaymentDocument>({
-  userId: {
-    type: String,
-    required: true,
+const PaymentSchema = new Schema<PaymentDocument>(
+  {
+    userId: {
+      type: String,
+      required: true,
+    },
+    userEmail: {
+      type: String,
+      required: true,
+    },
+    paymentEntries: [paymentEntrySchema],
   },
-  userEmail: {
-    type: String,
-    required: true,
-  },
-  paymentEntries: [paymentEntrySchema],
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Create the Payment model from the schema
-const PaymentModel = model<PaymentDocument>(
+const PaymentsModel = model<PaymentDocument>(
   "paymentCollections",
   PaymentSchema
 );
 
-export default PaymentModel;
+export default PaymentsModel;

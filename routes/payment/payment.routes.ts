@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { initiatePayment, handlePaymentSuccess, handlePaymentFail, handlePaymentCancel, createPayment } from '../../controllers/pricing/payment/payment.controller';
-import { savePaymentDetails } from '../../controllers/paymentController/paymentStripe.controller';
+import { getPayments, savePaymentDetails } from '../../controllers/paymentController/paymentStripe.controller';
 
 const router = Router();
 
-router.post("/save-payment", savePaymentDetails);
+router.get("/:userId", getPayments);
+router.post("/add-payment", savePaymentDetails);
 // Route to initiate payment
 router.post('/initiate', initiatePayment);
 
