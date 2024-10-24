@@ -11,7 +11,10 @@ export const registerUser = async (req: Request, res: Response) => {
     const token = generateToken(email);
 
     if (userExists) {
-      return res.status(200).send({ message: token, subscriptionStatus: userExists.subscriptionStatus });
+      return res.status(200).send({
+        message: token,
+        subscriptionStatus: userExists.subscriptionStatus,
+      });
     }
     const addUser = await UserModel.create(userData);
     if (addUser) {
@@ -28,18 +31,28 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const getUsers = async (req: Request, res: Response) => {
+  const email = req.query.email;
+  const tab = req.query.tab as string | string[] | undefined;
+
   try {
-    const users = await UserModel.find();
-    if (users.length > 0) {
-      res.status(200).send({ users });
-    } else {
-      res.status(404).send({ message: "Users not found!" });
-    }
+      const allUsers = await UserModel.find();
+      let filteredUsers = allUsers;
+
+      if (email) {
+          filteredUsers = await UserModel.find({ email });
+      } 
+      else if (tab && tab !== "all") {
+          filteredUsers = await UserModel.find({ role: tab });
+      }
+
+      res.send(filteredUsers);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).send({ message: "Internal Server Error" });
+      console.error("Error fetching users:", error);
+      res.status(500).send({ message: "Internal Server Error" });
   }
 };
+
+
 
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
