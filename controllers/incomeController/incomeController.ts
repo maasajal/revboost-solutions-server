@@ -273,3 +273,96 @@ export const incomeStatusWithVat = async (req: Request, res: Response) => {
     return res.status(500).send({ message: "Internal server error" });
   }
 };
+
+export const getTaxStatus = async (req: Request, res: Response) => {
+  try {
+    const email = req.email;
+    const user = await IncomesModel.findOne({ userEmail: email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // মাস ভিত্তিক ইনকামের যোগফল এবং ভ্যাট স্ট্যাটাসের জন্য Map তৈরি
+    const monthlyIncome = new Map<
+      string,
+      {
+        totalIncome: number;
+        vat_status: string;
+        tax_rate: number;
+        tax_amount: number;
+      }
+    >();
+
+    // প্রতিটি ইনকাম এন্ট্রি নিয়ে কাজ করা
+    user.incomeEntries.forEach((entry: any) => {
+      const month = new Date(entry.date).toLocaleString("default", {
+        month: "long",
+        year: "numeric",
+      });
+
+      // মাসের জন্য ডিফল্ট ভ্যাট স্ট্যাটাস
+      let vatStatus = entry.vat_status === "pending" ? "pending" : "success";
+
+      // যদি সেই মাসের জন্য যোগফল থাকে, তাহলে সেটি আপডেট করা
+      if (monthlyIncome.has(month)) {
+        const currentData = monthlyIncome.get(month)!;
+        monthlyIncome.set(month, {
+          totalIncome: currentData.totalIncome + entry.amount,
+          vat_status:
+            currentData.vat_status === "pending" ? "pending" : vatStatus,
+          tax_rate: currentData.tax_rate,
+          tax_amount: currentData.tax_amount,
+        });
+      } else {
+        // নতুন মাসের জন্য যোগফল তৈরি করা
+        monthlyIncome.set(month, {
+          totalIncome: entry.amount,
+          vat_status: vatStatus,
+          tax_rate: 0, // ডিফল্ট
+          tax_amount: 0, // ডিফল্ট
+        });
+      }
+    });
+
+    // প্রতিটি মাসের জন্য ট্যাক্স রেট নির্ধারণ
+    monthlyIncome.forEach((data, month) => {
+      let taxRate = 0;
+      let taxAmount = 0;
+
+      if (data.totalIncome > 300000 && data.totalIncome <= 600000) {
+        taxRate = 10;
+        taxAmount = (data.totalIncome - 300000) * (taxRate / 100);
+      } else if (data.totalIncome > 600000 && data.totalIncome <= 1200000) {
+        taxRate = 15;
+        taxAmount = (data.totalIncome - 600000) * (taxRate / 100);
+      } else if (data.totalIncome > 1200000 && data.totalIncome <= 3000000) {
+        taxRate = 20;
+        taxAmount = (data.totalIncome - 1200000) * (taxRate / 100);
+      } else if (data.totalIncome > 3000000) {
+        taxRate = 25;
+        taxAmount = (data.totalIncome - 3000000) * (taxRate / 100);
+      }
+
+      monthlyIncome.set(month, {
+        ...data,
+        tax_rate: taxRate,
+        tax_amount: taxAmount,
+      });
+    });
+
+    // মাস অনুযায়ী ইনকামের যোগফল এবং ভ্যাট স্ট্যাটাস সহ ট্যাক্স রেট এবং কাটা হওয়া ট্যাক্স দেখানো
+    const result = Array.from(monthlyIncome, ([month, data]) => ({
+      month,
+      totalIncome: data.totalIncome,
+      vat_status: data.vat_status,
+      tax_rate: data.tax_rate,
+      tax_amount: data.tax_amount,
+    }));
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
