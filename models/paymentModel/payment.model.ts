@@ -1,16 +1,17 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model, Document } from "mongoose";
 
 interface IPaymentEntry {
   transactionId: string;
+  payment_status: string;
   paymentDate: Date;
-  paymentTime: string;
+  due_date: Date;
   amount: number;
 }
 // Payment Document Interface
 interface PaymentDocument extends Document {
   userId: string;
   userEmail: string;
-  paymentEntries: IPaymentEntry[]
+  paymentEntries: IPaymentEntry[];
 }
 
 // Mongoose Payment Schema
@@ -20,13 +21,18 @@ const paymentEntrySchema = new Schema<IPaymentEntry>({
     required: true,
     unique: true,
   },
+  payment_status: {
+    type: String,
+    required: true,
+    default: "pending",
+  },
   paymentDate: {
     type: Date,
     required: true,
     default: Date.now,
   },
-  paymentTime: {
-    type: String,
+  due_date: {
+    type: Date,
     required: true,
   },
   amount: {
@@ -34,7 +40,6 @@ const paymentEntrySchema = new Schema<IPaymentEntry>({
     required: true,
   },
 });
-
 
 const PaymentSchema = new Schema<PaymentDocument>({
   userId: {
@@ -45,10 +50,13 @@ const PaymentSchema = new Schema<PaymentDocument>({
     type: String,
     required: true,
   },
-  paymentEntries:[paymentEntrySchema]
+  paymentEntries: [paymentEntrySchema],
 });
 
 // Create the Payment model from the schema
-const PaymentModel = model<PaymentDocument>('paymentCollection', PaymentSchema);
+const PaymentModel = model<PaymentDocument>(
+  "paymentCollections",
+  PaymentSchema
+);
 
 export default PaymentModel;
