@@ -35,24 +35,21 @@ export const getUsers = async (req: Request, res: Response) => {
   const tab = req.query.tab as string | string[] | undefined;
 
   try {
-      const allUsers = await UserModel.find();
-      let filteredUsers = allUsers;
+    const allUsers = await UserModel.find();
+    let filteredUsers = allUsers;
 
-      if (email) {
-          filteredUsers = await UserModel.find({ email });
-      } 
-      else if (tab && tab !== "all") {
-          filteredUsers = await UserModel.find({ role: tab });
-      }
+    if (email) {
+      filteredUsers = await UserModel.find({ email });
+    } else if (tab && tab !== "all") {
+      filteredUsers = await UserModel.find({ role: tab });
+    }
 
-      res.send(filteredUsers);
+    res.send(filteredUsers);
   } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).send({ message: "Internal Server Error" });
+    console.error("Error fetching users:", error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };
-
-
 
 export const getUserByEmail = async (req: Request, res: Response) => {
   try {
@@ -72,13 +69,14 @@ export const getUserByEmail = async (req: Request, res: Response) => {
 };
 
 export const updateUserByEmail = async (req: Request, res: Response) => {
-  try {
-    const email = req.params.email;
+  try { 
+    const email = req.params.email; 
+
     const user = await UserModel.findOne({ email });
     if (!user) {
       return res.status(404).send({ message: "User not found" });
     }
-    const updatedFields = req.body;
+    const updatedFields = req.body; 
     Object.assign(user, updatedFields);
     await user.save();
 
@@ -113,3 +111,30 @@ export const deleteUserById = async (req: Request, res: Response) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
+
+
+export const updateUserSubscriptionStatus = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.body.userId; // Assuming userId is passed in the request body
+    const newSubscriptionStatus = req.body.updateStatus;   
+    // Find the user by ID
+    const user = await UserModel.findById(userId); 
+    // Log the fetched user for debugging  
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }  
+    // Update subscription status
+    user.subscriptionStatus = newSubscriptionStatus;  
+    console.log("Updated Subscription Status:", user.subscriptionStatus);   
+    // Save the updated document
+    const updatedUser = await user.save(); // Use await to wait for the save operation  
+    return res.status(200).json(updatedUser);
+    
+  } catch (error) {
+    console.error("Error updating user subscription status:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+}
