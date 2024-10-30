@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import PaymentsModel from "../../models/paymentModel/payment.model";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2024-09-30.acacia",
+});
 
 export const getPayments = async (req: Request, res: Response) => {
   const { userId } = req.params;
@@ -94,5 +99,22 @@ export const savePaymentDetails = async (req: Request, res: Response) => {
       message: "Failed to add or update payment entries",
       error: error.message,
     });
+  }
+};
+
+export const createPaymentIntent = async (req: Request, res: Response) => {
+  const { amount } = req.body;
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
+
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).send({ error: err.message });
   }
 };
