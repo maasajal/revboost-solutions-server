@@ -34,7 +34,11 @@ const paymentEntrySchema = new Schema<IPaymentEntry>(
     },
     due_date: {
       type: Date,
-      required: true,
+      default: () => {
+        const date = new Date();
+        date.setDate(10);
+        return date;
+      },
     },
     amount: {
       type: Number,
