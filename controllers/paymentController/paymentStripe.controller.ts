@@ -3,7 +3,7 @@ import PaymentsModel from "../../models/paymentModel/payment.model";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-09-30.acacia",
+  apiVersion: "2024-11-20.acacia",
 });
 
 export const getPayments = async (req: Request, res: Response) => {
